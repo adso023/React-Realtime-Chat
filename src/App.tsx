@@ -1,25 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Navigate, Route, Routes } from "react-router";
+import "./App.css";
+import ChatList from "./pages/ChatList";
+import Login from "./pages/Login";
+import NewMessage from "./pages/NewMessage";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
+import SignupPage from "./pages/Signup";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" />}></Route>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/chat" element={<ChatList />} />
+        <Route path="/new" element={<NewMessage />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/account-settings" element={<Settings />} />
+      </Routes>
+    </>
   );
 }
 
