@@ -24,6 +24,7 @@ import {
   TextField,
   Button,
   ButtonGroup,
+  LinearProgress,
 } from "@mui/material";
 import moment from "moment";
 import { signOut, User } from "firebase/auth";
@@ -356,6 +357,7 @@ const ChatList = () => {
                       conversationClick={() => {
                         setChatId(chat);
                       }}
+                      uid={user!.uid}
                     />
                   ))}
               </List>
@@ -372,11 +374,37 @@ const ChatList = () => {
 interface ConversationListItemProps {
   chat?: string;
   refChat: QueryDocumentSnapshot<DocumentData>;
+  uid: string;
   conversationClick?: React.MouseEventHandler<HTMLLIElement>;
 }
 
 const ConversationListItem = (props: ConversationListItemProps) => {
-  const { conversationClick, chat, refChat } = props;
+  const { conversationClick, chat, refChat, uid } = props;
+  const [loading, setLoading] = useState<boolean>(false);
+  const [chatTitle, setChatTitle] = useState<string>("");
+
+  useEffect(() => {
+    let users: string[] = refChat.data()["users"];
+    users = users.filter((val) => val !== uid);
+    setLoading(true);
+    const userDocFutures = users.map((e) => getDoc(doc(db, "users", e)));
+
+    Promise.all(userDocFutures).then((docs) => {
+      const names = docs
+        .map((value) => {
+          return [
+            value.get("firstname").toString(),
+            value.get("lastname").toString(),
+          ].join(" ");
+        })
+        .join(", ");
+      console.log(names);
+      setChatTitle(names);
+      setLoading(false);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refChat]);
+
   return (
     <>
       <ListItem
@@ -402,7 +430,10 @@ const ConversationListItem = (props: ConversationListItemProps) => {
         >
           <ListItemText
             primary={
-              <div className="titleTruncate">{refChat.data()["title"]}</div>
+              <div className="titleTruncate">
+                {loading && <LinearProgress />}
+                {!loading && chatTitle}
+              </div>
             }
             secondary={
               <Container

@@ -290,7 +290,8 @@ const SignupPage = () => {
                       onClick={async () => {
                         const deleteRef = ref(storage, `profile/${file?.name}`);
                         await deleteObject(deleteRef);
-                        setDownloadUrl(null);
+                        setFile(null);
+                        setDownloadUrl(localStorage.getItem("template_url"));
                       }}
                     >
                       <DeleteForever />
