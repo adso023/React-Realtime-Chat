@@ -217,6 +217,8 @@ const ChatList = () => {
         }
       );
     }
+
+    return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authUser]);
 
@@ -314,8 +316,8 @@ const ChatList = () => {
         <Divider />
         <MenuItem
           onClick={() => {
-            signOut(auth);
             setAuthUser(null);
+            signOut(auth);
           }}
         >
           <ListItemIcon>
@@ -357,7 +359,7 @@ const ChatList = () => {
                       conversationClick={() => {
                         setChatId(chat);
                       }}
-                      uid={user!.uid}
+                      uid={user?.uid!}
                     />
                   ))}
               </List>
@@ -402,12 +404,15 @@ const ConversationListItem = (props: ConversationListItemProps) => {
       setChatTitle(names);
       setLoading(false);
     });
+
+    return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refChat]);
 
   return (
     <>
       <ListItem
+        key={refChat.id}
         alignItems="flex-start"
         onClick={conversationClick}
         sx={{
@@ -425,7 +430,7 @@ const ConversationListItem = (props: ConversationListItemProps) => {
         <Tooltip
           placement="left-end"
           arrow={true}
-          title={refChat.data()["title"]}
+          title={refChat.data()["title"] ?? ""}
           followCursor
         >
           <ListItemText
@@ -526,6 +531,8 @@ const ConversationWrapper = (props: ConversationWrapperProps) => {
         }
       );
     }
+
+    return () => {};
   }, [chat]);
 
   return (
@@ -604,6 +611,8 @@ const MessageBoard = (props: MessageBoardProps) => {
       setLoading(false);
       scrollToBottom();
     });
+
+    return () => {};
   }, [chat]);
 
   return (
@@ -735,6 +744,7 @@ const MessageItem = (props: MessageItemProps) => {
 
   useEffect(() => {
     setItem(getUser(message.data()["sent_by"]));
+    return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

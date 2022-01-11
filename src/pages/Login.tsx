@@ -15,7 +15,6 @@ import {
   CardActions,
   CardContent,
   CardHeader,
-  Container,
   FormControl,
   IconButton,
   InputAdornment,
@@ -32,6 +31,7 @@ import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router";
 import { auth } from "../firebase/clientApp";
 import useLocalStorage from "../hooks/hooks";
+import "../styles/Login.scss";
 
 interface ILoginForm {
   username: string;
@@ -94,7 +94,6 @@ const Login = () => {
     password: "",
   });
 
-  const [loading, setLoading] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [visible, setVisible] = useState<boolean>(false);
   const open = Boolean(anchorEl);
@@ -106,8 +105,8 @@ const Login = () => {
     setAnchorEl(null);
   };
   return (
-    <Container style={{ width: "100vw", padding: 0, margin: 0 }}>
-      <Box width={"100vw"}>
+    <>
+      <Box>
         <AppBar position="static">
           <Toolbar style={{ display: "flex", justifyContent: "space-between" }}>
             <Box>
@@ -162,15 +161,7 @@ const Login = () => {
           <Link href="/signup">Sign Up</Link>
         </MenuItem>
       </Menu>
-      <Container
-        style={{
-          width: "100vw",
-          padding: 0,
-          margin: 0,
-          display: "flex",
-          justifyContent: "center",
-        }}
-      >
+      <div className="centered-container">
         <Card sx={{ maxWidth: 500, width: 500, margin: 2 }} elevation={10}>
           <CardHeader
             title={
@@ -242,11 +233,10 @@ const Login = () => {
           </CardContent>
           <CardActions>
             <LoadingButton
-              loading={loading}
+              loading={signInLoading}
               startIcon={<LoginOutlined />}
               variant="contained"
               onClick={async () => {
-                setLoading(true);
                 const validate = ((): boolean => {
                   const errors: ILoginFormError = {
                     usernameError: "",
@@ -277,8 +267,6 @@ const Login = () => {
                   // Sign in errors taken care of in useEffect above
                   await signIn(`${form.username}@rtchat.com`, form.password);
                 }
-
-                setLoading(false);
               }}
             >
               Submit
@@ -287,7 +275,6 @@ const Login = () => {
               variant="text"
               color="secondary"
               onClick={() => {
-                setLoading(false);
                 setAlert(false);
                 setFormData({ username: "", password: "" });
                 setFormErrors({ usernameError: "", passwordError: "" });
@@ -297,8 +284,8 @@ const Login = () => {
             </Button>
           </CardActions>
         </Card>
-      </Container>
-    </Container>
+      </div>
+    </>
   );
 };
 

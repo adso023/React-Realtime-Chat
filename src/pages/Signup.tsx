@@ -17,7 +17,6 @@ import {
   CardContent,
   CardHeader,
   CircularProgress,
-  Container,
   FormControl,
   Grid,
   IconButton,
@@ -43,6 +42,7 @@ import {
   deleteObject,
 } from "firebase/storage";
 import { useCallback } from "react";
+import "../styles/Login.scss";
 
 interface ISignUpForm {
   username: string;
@@ -108,6 +108,8 @@ const SignupPage = () => {
     } else {
       setUserInfoUpdate(UserInfoState.none);
     }
+
+    return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authUser, userInfoUpdate]);
 
@@ -122,6 +124,8 @@ const SignupPage = () => {
   }, []);
   useEffect(() => {
     templateCallback();
+
+    return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -151,6 +155,8 @@ const SignupPage = () => {
 
       setAlert(true);
     }
+
+    return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signInError]);
 
@@ -182,8 +188,8 @@ const SignupPage = () => {
   };
 
   return (
-    <Container style={{ width: "100vw", padding: 0, margin: 0 }}>
-      <Box width={"100vw"}>
+    <>
+      <Box>
         <AppBar position="static">
           <Toolbar style={{ display: "flex", justifyContent: "space-between" }}>
             <Box>
@@ -238,15 +244,7 @@ const SignupPage = () => {
           <Link href="/login">Login</Link>
         </MenuItem>
       </Menu>
-      <Container
-        style={{
-          width: "100vw",
-          padding: 0,
-          margin: 0,
-          display: "flex",
-          justifyContent: "center",
-        }}
-      >
+      <div className="centered-container">
         {/* Below are sign up states */}
         {userInfoUpdate === UserInfoState.loading && <CircularProgress />}
         {(userInfoUpdate === UserInfoState.none ||
@@ -590,8 +588,8 @@ const SignupPage = () => {
             </CardActions>
           </Card>
         )}
-      </Container>
-    </Container>
+      </div>
+    </>
   );
 };
 
