@@ -114,14 +114,11 @@ const SignupPage = () => {
   }, [user, authUser, userInfoUpdate]);
 
   const templateCallback = useCallback(async () => {
-    console.log("templatecallback was called");
     if (!localStorage.getItem("template_url")) {
-      console.log("Not in local storage. Fetching template image");
       const templateRef = ref(storage, "template/profile_placeholder.png");
       const url = await getDownloadURL(templateRef);
       setDownloadUrl(url);
     } else {
-      console.log("Found template image in local storage");
       setDownloadUrl(localStorage.getItem("template_url"));
     }
   }, []);
