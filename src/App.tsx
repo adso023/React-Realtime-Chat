@@ -1,11 +1,11 @@
 import { Navigate, Route, Routes } from "react-router";
 import "./App.css";
-import ChatList from "./pages/ChatList";
-import Login from "./pages/Login";
-import NewMessage from "./pages/NewMessage";
-import Profile from "./pages/Profile";
-import Settings from "./pages/Settings";
-import SignupPage from "./pages/Signup";
+import ChatList from "./pages/Dashboard/ChatList";
+import Login from "./pages/AuthPage/Login";
+import NewMessage from "./pages/NewMessagePage/NewMessage";
+import Profile from "./pages/UserDashboard/Profile";
+import Settings from "./pages/UserDashboard/Settings";
+import SignupPage from "./pages/AuthPage/Signup";
 
 function App() {
   return (

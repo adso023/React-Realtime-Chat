@@ -54,8 +54,8 @@ import {
 import React, { useState, useEffect, ChangeEvent } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useLocation, useNavigate } from "react-router";
-import { auth, db } from "../firebase/clientApp";
-import useLocalStorage from "../hooks/hooks";
+import { auth, db } from "../../firebase/clientApp";
+import useLocalStorage from "../../hooks/hooks";
 
 const windowStyling: React.CSSProperties = {
   width: "100vw",

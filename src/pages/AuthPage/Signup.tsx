@@ -1,16 +1,7 @@
-import {
-  DeleteForever,
-  Login,
-  Person,
-  Visibility,
-  VisibilityOff,
-} from "@mui/icons-material";
+import { Login, Visibility, VisibilityOff } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import {
   Alert,
-  AppBar,
-  Avatar,
-  Box,
   Button,
   Card,
   CardActions,
@@ -21,64 +12,42 @@ import {
   Grid,
   IconButton,
   InputAdornment,
-  Link,
-  Menu,
-  MenuItem,
   TextField,
-  Toolbar,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
-import { auth, db, storage } from "../firebase/clientApp";
+import { useEffect, useState } from "react";
+import { auth, db } from "../../firebase/clientApp";
 import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
-import useLocalStorage from "../hooks/hooks";
+import useLocalStorage from "../../hooks/hooks";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import "../../styles/Login.scss";
+import { NavMenu } from "./components/NavMenu";
+import { ProfilePicker } from "./components/ImagePicker";
 import {
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  deleteObject,
-} from "firebase/storage";
-import { useCallback } from "react";
-import "../styles/Login.scss";
-
-interface ISignUpForm {
-  username: string;
-  password: string;
-  firstname: string;
-  lastname: string;
-  confirmPassword: string;
-}
-
-interface ISignupFormError {
-  usernameError: string;
-  passwordError: string;
-  firstname: string;
-  lastname: string;
-  confirmPasswordError: string;
-}
-
-enum UserInfoState {
-  loading,
-  completed,
-  initial,
-  none,
-}
+  ISignUpForm,
+  ISignupFormError,
+  UserInfoState,
+} from "../../models/auth";
+import { signUpValidation } from "../../helpers/validators";
+import { TopBar } from "./components/TopBar";
 
 const SignupPage = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [createUser, user, signInLoading, signInError] =
     useCreateUserWithEmailAndPassword(auth);
+
   const navigate = useNavigate();
+
   const [authUser] = useLocalStorage(
     "firebase:authUser:AIzaSyA-uMoXeXjTyfeCp9F-gBgCEVVOobeoiaU:[DEFAULT]",
     null
   );
+
   const [userInfoUpdate, setUserInfoUpdate] = useState<UserInfoState>(
     UserInfoState.initial
   );
+
   useEffect(() => {
     if (user || authUser) {
       const userRef = user
@@ -113,22 +82,6 @@ const SignupPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authUser, userInfoUpdate]);
 
-  const templateCallback = useCallback(async () => {
-    if (!localStorage.getItem("template_url")) {
-      const templateRef = ref(storage, "template/profile_placeholder.png");
-      const url = await getDownloadURL(templateRef);
-      setDownloadUrl(url);
-    } else {
-      setDownloadUrl(localStorage.getItem("template_url"));
-    }
-  }, []);
-  useEffect(() => {
-    templateCallback();
-
-    return () => {};
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const [errors, setFormErrors] = useState<ISignupFormError>({
     usernameError: "",
     passwordError: "",
@@ -136,6 +89,7 @@ const SignupPage = () => {
     firstname: "",
     lastname: "",
   });
+
   const [alert, setAlert] = useState<boolean>(false);
 
   useEffect(() => {
@@ -169,15 +123,12 @@ const SignupPage = () => {
   });
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const open = Boolean(anchorEl);
 
   const [visible, setVisible] = useState<boolean>(false);
+
   const [confVisible, setConfVisible] = useState<boolean>(false);
 
-  const [loading, setLoading] = useState<boolean>(false);
-  const fileRef = useRef<HTMLInputElement | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
-  const [file, setFile] = useState<File | null>(null);
 
   const handleClick = (e: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(e.currentTarget);
@@ -189,61 +140,17 @@ const SignupPage = () => {
 
   return (
     <>
-      <Box>
-        <AppBar position="static">
-          <Toolbar style={{ display: "flex", justifyContent: "space-between" }}>
-            <Box>
-              <Typography variant="h5">Create Account</Typography>
-            </Box>
-            <Tooltip title="Sign Up Here">
-              <IconButton onClick={handleClick}>
-                <Avatar>
-                  <Person />
-                </Avatar>
-              </IconButton>
-            </Tooltip>
-          </Toolbar>
-        </AppBar>
-      </Box>
-      <Menu
-        anchorEl={anchorEl}
-        id="account-menu"
-        open={open}
-        onClose={handleClose}
-        onClick={handleClose}
-        PaperProps={{
-          elevation: 0,
-          sx: {
-            overflow: "visible",
-            filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-            mt: 1.5,
-            "& .MuiAvatar-root": {
-              width: 32,
-              height: 32,
-              ml: -0.5,
-              mr: 1,
-            },
-            "&:before": {
-              content: '""',
-              display: "block",
-              position: "absolute",
-              top: 0,
-              right: 14,
-              width: 10,
-              height: 10,
-              bgcolor: "background.paper",
-              transform: "translateY(-50%) rotate(45deg)",
-              zIndex: 0,
-            },
-          },
-        }}
-        transformOrigin={{ horizontal: "right", vertical: "top" }}
-        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-      >
-        <MenuItem>
-          <Link href="/login">Login</Link>
-        </MenuItem>
-      </Menu>
+      <TopBar
+        title="Create Account"
+        altTitle="Login Here"
+        onClick={handleClick}
+      />
+      <NavMenu
+        anchorPoint={anchorEl}
+        route="/login"
+        title="Login"
+        onCloseClick={handleClose}
+      />
       <div className="centered-container">
         {/* Below are sign up states */}
         {userInfoUpdate === UserInfoState.loading && <CircularProgress />}
@@ -269,98 +176,11 @@ const SignupPage = () => {
               ) : (
                 <></>
               )}
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  position: "relative",
+              <ProfilePicker
+                onClick={(url: string | null) => {
+                  setDownloadUrl(url);
                 }}
-              >
-                {downloadUrl && file && (
-                  <Tooltip title="Delete profile image">
-                    <IconButton
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: "55%",
-                        zIndex: 1000,
-                      }}
-                      onClick={async () => {
-                        const deleteRef = ref(storage, `profile/${file?.name}`);
-                        await deleteObject(deleteRef);
-                        setFile(null);
-                        await templateCallback();
-                      }}
-                    >
-                      <DeleteForever />
-                    </IconButton>
-                  </Tooltip>
-                )}
-                <Tooltip
-                  title={
-                    !file
-                      ? "Click to add a profile image"
-                      : "Click to replace profile"
-                  }
-                >
-                  <IconButton
-                    onClick={() => {
-                      fileRef.current?.click();
-                    }}
-                  >
-                    {!downloadUrl && (
-                      <Avatar
-                        sx={{
-                          width: 100,
-                          height: 100,
-                          fontSize: 20,
-                        }}
-                      >
-                        Profile Image
-                      </Avatar>
-                    )}
-                    {downloadUrl && (
-                      <Avatar
-                        src={downloadUrl}
-                        sx={{ width: 100, height: 100, fontSize: 30 }}
-                      />
-                    )}
-                    <input
-                      ref={fileRef}
-                      type="file"
-                      id="profileInput"
-                      style={{ display: "none" }}
-                      accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*"
-                      onChange={async (e: ChangeEvent<HTMLInputElement>) => {
-                        if (e.target.files?.length !== 0) {
-                          setFile(e.target.files![0]);
-                          console.log(e.target.files!);
-                          try {
-                            const uploadRef = ref(
-                              storage,
-                              `profile/${e.target.files![0].name}`
-                            );
-                            const uploadTask = await uploadBytes(
-                              uploadRef,
-                              e.target.files![0],
-                              {
-                                contentType: e.target.files![0].type,
-                              }
-                            );
-                            const url = await getDownloadURL(uploadTask.ref);
-                            console.log(url);
-                            setDownloadUrl(url);
-                          } catch (e) {
-                            console.log(e);
-                          }
-                        } else {
-                          console.log("No files selected");
-                        }
-                      }}
-                    />
-                  </IconButton>
-                </Tooltip>
-              </Box>
+              />
               <FormControl sx={{ width: "100%" }}>
                 <TextField
                   required
@@ -493,70 +313,22 @@ const SignupPage = () => {
             </CardContent>
             <CardActions>
               <LoadingButton
-                loading={loading}
+                loading={signInLoading}
                 startIcon={<Login />}
                 variant="contained"
                 onClick={async () => {
-                  setLoading(true);
-                  const validate = ((): boolean => {
-                    const errors: ISignupFormError = {
-                      usernameError: "",
-                      passwordError: "",
-                      confirmPasswordError: "",
-                      firstname: "",
-                      lastname: "",
-                    };
+                  const validate = signUpValidation(form);
 
-                    // Step 1 Check empty values
-                    if (form.username === "")
-                      errors.usernameError = "Field cannot be empty";
-                    if (form.password === "")
-                      errors.passwordError = "Field cannot be empty";
-                    if (form.confirmPassword === "")
-                      errors.confirmPasswordError = "Field cannot be empty";
-                    if (form.firstname === "")
-                      errors.firstname = "Field cannot be empty";
-                    if (form.lastname === "")
-                      errors.lastname = "Field cannot be empty";
-
-                    if (
-                      errors.usernameError !== "" ||
-                      errors.passwordError !== "" ||
-                      errors.confirmPasswordError !== "" ||
-                      errors.firstname !== "" ||
-                      errors.lastname !== ""
-                    ) {
-                      setFormErrors(errors);
-                      setAlert(true);
-                      return false;
-                    }
-
-                    // Step 2 Check same values
-                    if (form.password !== form.confirmPassword) {
-                      errors.confirmPasswordError =
-                        "Must be same as the password field";
-                    }
-
-                    if (errors.confirmPasswordError !== "") {
-                      setFormErrors(errors);
-                      setAlert(true);
-                      return false;
-                    }
-
-                    setFormErrors(errors);
-                    setAlert(false);
-                    return true;
-                  })();
-
-                  if (validate) {
+                  if (validate.completed) {
                     // Sign in errors taken care of in useEffect above
                     await createUser(
                       `${form.username}@rtchat.com`,
                       form.password
                     );
+                  } else {
+                    setAlert(validate.alert);
+                    setFormErrors(validate.errors as ISignupFormError);
                   }
-
-                  setLoading(false);
                 }}
               >
                 Submit
@@ -580,7 +352,6 @@ const SignupPage = () => {
                     lastname: "",
                   });
                   setAlert(false);
-                  setLoading(false);
                 }}
               >
                 Clear
